@@ -10,6 +10,16 @@ import Photos
 }
 
 public struct ImagePickerClosure {
+  
+  public init(
+    wrapper: @escaping ((ImagePickerController, [UIImage]) -> Void),
+    done: @escaping ((ImagePickerController, [UIImage]) -> Void),
+    cancel: @escaping ((ImagePickerController) -> Void)) {
+    self.wrapperDidPress = wrapper
+    self.doneButtonDidPress = done
+    self.cancelButtonDidPress = cancel
+  }
+  
   let wrapperDidPress: ((ImagePickerController, [UIImage]) -> Void)
   let doneButtonDidPress: ((ImagePickerController, [UIImage]) -> Void)
   let cancelButtonDidPress: ((ImagePickerController) -> Void)

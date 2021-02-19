@@ -9,6 +9,12 @@ import Photos
   func cancelButtonDidPress(_ imagePicker: ImagePickerController)
 }
 
+public struct ImagePickerClosure {
+  let wrapperDidPress: ((ImagePickerController, [UIImage]) -> Void)
+  let doneButtonDidPress: ((ImagePickerController, [UIImage]) -> Void)
+  let cancelButtonDidPress: ((ImagePickerController) -> Void)
+}
+
 open class ImagePickerController: UIViewController {
 
   let configuration: ImagePickerConfiguration
@@ -70,6 +76,7 @@ open class ImagePickerController: UIViewController {
   var volume = AVAudioSession.sharedInstance().outputVolume
 
   @objc open weak var delegate: ImagePickerDelegate?
+  open var closure: ImagePickerClosure?
   open var stack = ImageStack()
   open var imageLimit = 0
   open var preferredImageSize: CGSize?
@@ -94,16 +101,19 @@ open class ImagePickerController: UIViewController {
   @objc public required init(configuration: ImagePickerConfiguration = ImagePickerConfiguration()) {
     self.configuration = configuration
     super.init(nibName: nil, bundle: nil)
+    self.delegate = self
   }
 
   public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     self.configuration = ImagePickerConfiguration()
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+    self.delegate = self
   }
   
   public required init?(coder aDecoder: NSCoder) {
     self.configuration = ImagePickerConfiguration()
     super.init(coder: aDecoder)
+    self.delegate = self
   }
 
   // MARK: - View lifecycle
@@ -298,6 +308,7 @@ open class ImagePickerController: UIViewController {
     // If only one image is requested and a push occures, automatically dismiss the ImagePicker
     if imageLimit == 1 {
       doneButtonDidPress()
+      
     }
   }
 
@@ -406,7 +417,6 @@ extension ImagePickerController: BottomContainerViewDelegate {
     } else {
         images = AssetManager.resolveAssets(stack.assets)
     }
-
     delegate?.wrapperDidPress(self, images: images)
   }
 }
@@ -560,5 +570,19 @@ extension ImagePickerController: PHPhotoLibraryChangeObserver {
     DispatchQueue.main.async {
       self.permissionGranted()
     }
+  }
+}
+
+extension ImagePickerController: ImagePickerDelegate {
+  public func wrapperDidPress(_ imagePicker: ImagePickerController, images: [UIImage]) {
+    self.closure?.wrapperDidPress(imagePicker, images)
+  }
+  
+  public func doneButtonDidPress(_ imagePicker: ImagePickerController, images: [UIImage]) {
+    self.closure?.doneButtonDidPress(imagePicker, images)
+  }
+  
+  public func cancelButtonDidPress(_ imagePicker: ImagePickerController) {
+    self.closure?.cancelButtonDidPress(imagePicker)
   }
 }

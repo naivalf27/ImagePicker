@@ -45,6 +45,7 @@ import UIKit
   @objc public var collapseCollectionViewWhileShot = true
   @objc public var recordLocation = true
   @objc public var allowMultiplePhotoSelection = true
+  @objc public var stackIsVisibleInSingleSelection = false
   @objc public var allowVideoSelection = false
   @objc public var showsImageCountLabel = true
   @objc public var flashButtonAlwaysHidden = false

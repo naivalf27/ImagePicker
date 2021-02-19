@@ -92,9 +92,8 @@ open class BottomContainerView: UIView {
       borderPickerButton.isHidden = true
       pickerButton.isHidden = true
     }
-    if !configuration.allowMultiplePhotoSelection {
-      stackView.isHidden = true
-    }
+    
+    stackView.isHidden = !configuration.allowMultiplePhotoSelection && !configuration.stackIsVisibleInSingleSelection
   }
 
   // MARK: - Action methods

@@ -179,6 +179,11 @@ open class ImagePickerController: UIViewController {
   }
 
   func checkStatus() {
+    if #available(iOS 14, *), PHPhotoLibrary.authorizationStatus(for: .readWrite) == .limited {
+      PHPhotoLibrary.shared().register(self)
+      PHPhotoLibrary.shared().presentLimitedLibraryPicker(from: self)
+      return
+    }
     let currentStatus = PHPhotoLibrary.authorizationStatus()
     guard currentStatus != .authorized else { return }
 
@@ -546,6 +551,14 @@ extension ImagePickerController: ImageGalleryPanGestureDelegate {
       expandGalleryView()
     } else if velocity.y > GestureConstants.velocity || galleryHeight < GestureConstants.minimumHeight {
       collapseGalleryView(nil)
+    }
+  }
+}
+
+extension ImagePickerController: PHPhotoLibraryChangeObserver {
+  public func photoLibraryDidChange(_ changeInstance: PHChange) {
+    DispatchQueue.main.async {
+      self.permissionGranted()
     }
   }
 }
